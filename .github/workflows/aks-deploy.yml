@@ -1,0 +1,39 @@
+name: Deploy to AKS
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/cehckout@v2
+
+    - name: log in to azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: build docker image
+      run: docker build -t myacr.azurecr.io/myapp:v1 .
+
+    - name: push docker image to ACR
+      run:  docker push myacr.azurecr.io/myapp:v1
+
+    - name: deploy to AKS
+      run: |
+        kubectl set image deployment/myapp myapp=myacr.azurecr.io/myapp:v1
+    
+
+
+
+
+
+
+
+
+      
